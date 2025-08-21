@@ -49,24 +49,32 @@ function HomePage(){
         }
     };
 
+    const handleKeyDown = (event) => {
+        if(event.key == 'Enter'){
+            handleGenerateReadme();
+        }
+    }
+
     return (
         <>
             <LoadingBar color="#f11946" ref={loadingBarRef} />
             <div className='flex justify-center flex-col items-center fixed top-[calc(50%-50px)] left-1/2 -translate-x-1/2 -translate-y-1/2'>
-                <img src={'/assets/dark-theme-logo.png'} className='h-[420px]' alt="Logo"/>
-                <div className='flex justify-center items-center gap-4'>
+                <img src={'/assets/dark-theme-logo.png'} className='h-[250px]' alt="Logo"/>
+                <div className='p-12 pt-1 whitespace-nowrap mb-4'>Instantly generate a beautiful README from your GitHub repo</div>
+                <div className='flex justify-center items-center gap-4 '>
                     <input
                         placeholder='paste your repo URL here'
-                        className='border p-4 pl-6 h-15 w-150 rounded-[3px]'
+                        className='border focus:border-white p-4 pl-6 h-10 w-[50vw] rounded-[5px]'
                         value={repoUrl}
                         onChange={(e) => setRepoUrl(e.target.value)}
+                        onKeyDown={handleKeyDown}
                     />
-                    <button
-                        className='p-3 h-15 border rounded-[3px] flex items-center justify-center'
+                    {/* <button
+                        className='p-0 h-10 border rounded-[3px] flex items-center justify-center'
                         onClick={handleGenerateReadme}
                     >
-                        <img src={"/assets/icons/box-arrow.svg"} className='h-10' alt="generate" />
-                    </button>
+                        <img src={"/assets/icons/box-arrow.svg"} className='h-[100%]' alt="generate" />
+                    </button> */}
                 </div>
             </div>
         </>
