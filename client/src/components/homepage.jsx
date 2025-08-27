@@ -57,7 +57,7 @@ function HomePage(){
 
     return (
         <>
-            <LoadingBar color="#f11946" ref={loadingBarRef} />
+            <LoadingBar color="white" ref={loadingBarRef} />
             <div className='flex justify-center flex-col items-center fixed top-[calc(50%-50px)] left-1/2 -translate-x-1/2 -translate-y-1/2'>
                 <img src={'/assets/dark-theme-logo.png'} className='h-[250px]' alt="Logo"/>
                 <div className='p-12 pt-1 whitespace-nowrap mb-4'>Instantly generate a beautiful README from your GitHub repo</div>
