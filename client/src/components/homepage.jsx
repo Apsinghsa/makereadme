@@ -158,17 +158,6 @@ function EditorView({ content, onChange, onDownload, streaming }) {
     const lines = content.split('\n');
     const h1idx = lines.findIndex(l => l.startsWith('# '));
     if (h1idx !== -1) {
-      // Check if there's already a center block after the title
-      let insertIdx = h1idx + 1;
-      // Skip existing blank lines and center block lines right after title
-      while (insertIdx < lines.length && (lines[insertIdx].trim() === '' || lines[insertIdx].startsWith('<p align="center">') || lines[insertIdx].startsWith('</p>') || lines[insertIdx].includes('!['))) {
-        if (lines[insertIdx].startsWith('</p>')) {
-          insertIdx++;
-          break;
-        }
-        insertIdx++;
-      }
-      // Insert into existing center block or create one
       // Find if there's a center block right after title
       let centerStart = -1, centerEnd = -1;
       for (let i = h1idx + 1; i < Math.min(h1idx + 10, lines.length); i++) {
@@ -176,15 +165,15 @@ function EditorView({ content, onChange, onDownload, streaming }) {
         if (centerStart !== -1 && lines[i].startsWith('</p>')) { centerEnd = i; break; }
       }
       if (centerStart !== -1 && centerEnd !== -1) {
-        // Insert before closing </p>
-        lines.splice(centerEnd, 0, badgeMd);
+        // Insert badge before </p>, with blank line separation
+        lines.splice(centerEnd, 0, '', badgeMd);
       } else {
-        // Create new center block after title
-        lines.splice(h1idx + 1, 0, '', '<p align="center">', badgeMd, '</p>', '');
+        // Create new center block after title with blank lines for GitHub markdown
+        lines.splice(h1idx + 1, 0, '', '<p align="center">', '', badgeMd, '', '</p>', '');
       }
       onChange(lines.join('\n'));
     } else {
-      onChange('<p align="center">\n' + badgeMd + '\n</p>\n\n' + content);
+      onChange('<p align="center">\n\n' + badgeMd + '\n\n</p>\n\n' + content);
     }
   }, [content, onChange]);
 
