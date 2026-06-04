@@ -1,19 +1,41 @@
 import express from 'express';
 const router = express.Router();
-import generateReadmeForRepo from '../controllers/readmeController.js';
+import fetchAndProcessRepoContents, { fetchAndProcessRepoContentsStream } from '../controllers/readmeController.js';
 
 router.get('/generate', async (req, res) => {
     try {
         const repoUrl = req.query.url;
+        const size = req.query.size || 'standard';
         if (!repoUrl) {
-            return res.status(400).send({ error: 'repoUrl query parameter is required' });
+            return res.status(400).json({ error: 'url query parameter is required' });
         }
-        const readmeData = await generateReadmeForRepo(repoUrl);
-        res.send(readmeData);
+        // Validate GitHub URL
+        if (!repoUrl.includes('github.com')) {
+            return res.status(400).json({ error: 'Only GitHub repositories are supported' });
+        }
+
+        // Set streaming headers
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Transfer-Encoding', 'chunked');
+        res.setHeader('X-Accel-Buffering', 'no');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.flushHeaders();
+
+        // Stream the README generation
+        for await (const chunk of fetchAndProcessRepoContentsStream(repoUrl, size)) {
+            res.write(chunk);
+        }
+        res.end();
     } catch (error) {
         console.error('Error generating README:', error);
-        res.status(500).send({ error: 'Failed to generate README' });
+        if (!res.headersSent) {
+            res.status(500).json({ error: error.message || 'Failed to generate README' });
+        } else {
+            res.end();
+        }
     }
 });
+
+router.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 export default router;

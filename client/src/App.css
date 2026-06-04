@@ -1,0 +1,55 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  background: #0d1117;
+}
+
+/* Markdown preview styles */
+.markdown-preview {
+  color: #e2e8f0;
+  line-height: 1.7;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 15px;
+}
+.markdown-preview h1 { font-size: 2em; font-weight: 700; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); color: #f1f5f9; }
+.markdown-preview h2 { font-size: 1.4em; font-weight: 600; margin: 28px 0 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.07); color: #f1f5f9; }
+.markdown-preview h3 { font-size: 1.1em; font-weight: 600; margin: 20px 0 8px; color: #cbd5e1; }
+.markdown-preview p { margin: 0 0 14px; color: #94a3b8; }
+.markdown-preview a { color: #4ade80; text-decoration: none; }
+.markdown-preview a:hover { text-decoration: underline; }
+.markdown-preview code {
+  background: rgba(255,255,255,0.08); border-radius: 4px;
+  padding: 2px 6px; font-size: 0.88em;
+  font-family: 'JetBrains Mono', monospace; color: #86efac;
+}
+.markdown-preview pre {
+  background: #161b22; border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 16px 20px; overflow-x: auto; margin: 0 0 16px;
+}
+.markdown-preview pre code { background: none; padding: 0; color: #e2e8f0; font-size: 13px; }
+.markdown-preview ul, .markdown-preview ol { padding-left: 22px; margin: 0 0 14px; }
+.markdown-preview li { margin: 4px 0; color: #94a3b8; }
+.markdown-preview blockquote {
+  border-left: 3px solid #4ade80; padding: 8px 16px; margin: 0 0 14px;
+  background: rgba(74,222,128,0.05); border-radius: 0 6px 6px 0; color: #64748b;
+}
+.markdown-preview table { border-collapse: collapse; width: 100%; margin: 0 0 16px; }
+.markdown-preview th, .markdown-preview td { border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; text-align: left; }
+.markdown-preview th { background: rgba(255,255,255,0.05); font-weight: 600; color: #cbd5e1; }
+.markdown-preview td { color: #94a3b8; }
+.markdown-preview img { max-width: 100%; height: auto; display: inline; }
+.markdown-preview hr { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 24px 0; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* Badge panel scroll */
+.badge-scroll::-webkit-scrollbar { width: 4px; }
+
+/* Center align for badges */
+.markdown-preview p[align="center"] { text-align: center; }

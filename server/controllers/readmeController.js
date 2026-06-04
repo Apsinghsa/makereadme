@@ -1,4 +1,4 @@
-import fetchAndProcessRepoContents from "../services/githubService.js";
+import fetchAndProcessRepoContents, { fetchAndProcessRepoContentsStream } from "../services/githubService.js";
 
 export default async function generateReadmeForRepo(repoUrl) {
     console.log("Starting README generation for:", repoUrl);
@@ -6,3 +6,5 @@ export default async function generateReadmeForRepo(repoUrl) {
     console.log("Finished README generation.");
     return readmeContent;
 }
+
+export { fetchAndProcessRepoContentsStream };
