@@ -1,5 +1,13 @@
+# Makereadme
+
+<p align="center">
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+</p>
+
+
 ## Table of Contents
 
+*   [Description](#description)
 *   [Features](#features)
 *   [Getting Started](#getting-started)
     *   [Prerequisites](#prerequisites)
@@ -10,7 +18,7 @@
 *   [Technologies Used](#technologies-used)
 *   [Deployment](#deployment)
 
----
+## Description
 
 This project is a web application designed to simplify the creation of comprehensive and professional `README.md` files for GitHub repositories. It leverages artificial intelligence (specifically, the Google Gemini API) to analyze a given codebase, extract key information, and automatically generate a well-structured and informative `README.md` file.
 
@@ -27,7 +35,7 @@ Users simply provide a GitHub repository URL through a user-friendly interface. 
 
 ## Getting Started
 
-Follow these instructions to set up and run the MakeReadme application on your local machine.
+Follow these instructions to set up and run the Makereadme application on your local machine.
 
 ### Prerequisites
 
