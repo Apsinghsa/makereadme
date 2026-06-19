@@ -27,7 +27,7 @@ export default function HomePage() {
             <a href="#features" className="hover:text-accent no-underline">Features</a>
             <a href="#flow" className="hover:text-accent no-underline">Flow</a>
           </nav>
-          <Link className="inline-flex items-center justify-center min-h-[40px] px-5 py-1 border border-border rounded-sm bg-transparent text-fg font-medium leading-loose !no-underline transition-colors hover:border-fg-2 hover:text-fg" to="/studio">Open studio</Link>
+          <Link className="inline-flex items-center justify-center min-h-[40px] px-5 py-1 border border-border rounded-sm bg-transparent text-fg font-medium leading-loose !no-underline transition-colors hover:border-fg hover:text-fg" to="/studio">Open studio</Link>
         </div>
       </header>
 
