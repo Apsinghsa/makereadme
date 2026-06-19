@@ -95,86 +95,88 @@
   background-position: right 6px center;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
 
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  line-height: var(--leading-body);
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-}
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
 
-#root {
-  min-height: 100%;
-}
+  #root {
+    min-height: 100%;
+  }
 
-a {
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
 
-a:hover {
-  color: var(--accent);
-}
+  a:hover {
+    color: var(--accent);
+  }
 
-button, input, textarea {
-  font: inherit;
-}
+  button, input, textarea {
+    font: inherit;
+  }
 
-button {
-  cursor: pointer;
-}
+  button {
+    cursor: pointer;
+  }
 
-h1, h2, h3, p {
-  margin: 0;
-}
+  h1, h2, h3, p {
+    margin: 0;
+  }
 
-h1, h2, h3 {
-  font-family: var(--font-display);
-  text-wrap: balance;
-}
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
 
-p {
-  text-wrap: pretty;
-}
+  p {
+    text-wrap: pretty;
+  }
 
-::placeholder {
-  color: var(--meta);
-}
+  ::placeholder {
+    color: var(--meta);
+  }
 
-:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--accent);
-}
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent);
+  }
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-}
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
 }
 
 /* Global / Shared CSS Component Layouts */
