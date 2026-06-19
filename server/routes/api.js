@@ -21,8 +21,14 @@ router.get('/generate', async (req, res) => {
         res.setHeader('Cache-Control', 'no-cache');
         res.flushHeaders();
 
+        // Parse optional sections filter (comma-separated list)
+        const rawSections = req.query.sections;
+        const sections = rawSections
+            ? rawSections.split(',').map(s => s.trim()).filter(Boolean)
+            : [];
+
         // Stream the README generation
-        for await (const chunk of fetchAndProcessRepoContentsStream(repoUrl, size)) {
+        for await (const chunk of fetchAndProcessRepoContentsStream(repoUrl, size, sections)) {
             res.write(chunk);
         }
         res.end();

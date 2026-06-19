@@ -51,4 +51,18 @@ export const BADGE_CATEGORIES = {
     { label: 'Maintained', color: 'green', logo: '', logoColor: '', static: true, message: 'yes', labelText: 'maintained' },
     { label: 'WIP', color: 'orange', logo: '', logoColor: '', static: true, message: 'WIP', labelText: 'status' },
   ],
+  'GitHub': [
+    { label: 'Stars',        github: true, path: 'stars',          color: 'yellow', logo: 'github', logoColor: 'white', style: 'social' },
+    { label: 'Forks',        github: true, path: 'forks',          color: 'blue',   logo: 'github', logoColor: 'white', style: 'social' },
+    { label: 'Watchers',     github: true, path: 'watchers',       color: 'blue',   logo: 'github', logoColor: 'white', style: 'social' },
+    { label: 'Issues',       github: true, path: 'issues',         color: 'red',    logo: 'github', logoColor: 'white' },
+    { label: 'Open PRs',     github: true, path: 'issues-pr',      color: 'blue',   logo: 'github', logoColor: 'white' },
+    { label: 'Last Commit',  github: true, path: 'last-commit',    color: '333',    logo: 'github', logoColor: 'white' },
+    { label: 'Contributors', github: true, path: 'contributors',   color: '444',    logo: 'github', logoColor: 'white' },
+    { label: 'License',      github: true, path: 'license',        color: 'blue',   logo: 'github', logoColor: 'white' },
+    { label: 'Repo Size',    github: true, path: 'repo-size',      color: '555',    logo: 'github', logoColor: 'white' },
+    { label: 'Code Size',    github: true, path: 'languages/code-size', color: '555', logo: 'github', logoColor: 'white' },
+    { label: 'Top Language', github: true, path: 'languages/top',  color: '555',    logo: 'github', logoColor: 'white' },
+  ],
 };
+

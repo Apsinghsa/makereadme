@@ -17,9 +17,7 @@ export default function StudioPage() {
 
   const [repoUrl, setRepoUrl] = useState(initialUrl);
   const [size] = useState(initialSize);
-  const [sections, setSections] = useState(
-    SECTIONS.filter((s) => s.defaultChecked).map((s) => s.value)
-  );
+  const [sections, setSections] = useState([]);
   const [viewMode, setViewMode] = useState('split');
   const [copied, setCopied] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Ready to edit');
@@ -94,7 +92,7 @@ export default function StudioPage() {
   const activeSectionCount = countActiveSections(sections);
 
   return (
-    <div className="studio-page">
+    <div className="grid grid-rows-[auto_1fr] min-h-screen bg-bg text-fg">
       <TopBar
         repoUrl={repoUrl}
         onRepoUrlChange={handleRepoUrlChange}
@@ -104,17 +102,18 @@ export default function StudioPage() {
         copied={copied}
         onDownload={handleDownload}
         isGenerated={isGenerated}
+        noSections={sections.length === 0}
       />
 
-      <div className="layout">
+      <div className="grid grid-cols-[300px_minmax(0,1fr)] min-h-[calc(100vh-65px)] max-[1100px]:grid-cols-1">
         <Sidebar>
           <SectionControls selectedSections={sections} onChange={setSections} />
-          <BadgePanel onInsertBadge={handleInsertBadge} disabled={!isGenerated} />
-          <section className="control-section">
-            <h2 className="section-title">Document</h2>
-            <div className="status-card">
-              <p><strong>{lineCount}</strong> lines</p>
-              <p><strong>{activeSectionCount}</strong> active sections</p>
+          <BadgePanel onInsertBadge={handleInsertBadge} disabled={!isGenerated} repoUrl={repoUrl} />
+          <section className="border-t border-border pt-5 mt-5 max-[1100px]:border-t-0 max-[1100px]:pt-0 max-[1100px]:mt-0">
+            <h2 className="text-muted text-xs font-bold uppercase mb-3">Document</h2>
+            <div className="border border-border rounded-lg bg-surface p-4 text-muted text-sm grid gap-2">
+              <p><strong className="text-fg">{lineCount}</strong> lines</p>
+              <p><strong className="text-fg">{activeSectionCount}</strong> active sections</p>
               <p>{statusMessage}</p>
             </div>
           </section>
