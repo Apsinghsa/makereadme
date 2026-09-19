@@ -67,7 +67,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd ~/makereadme
+            cd ~/makereadme/deploy
             cat > prod.env <<EOF
             GEMINI_API_KEY=${GEMINI_API_KEY}
             GITHUB_TOKEN=${GH_TOKEN}
