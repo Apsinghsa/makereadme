@@ -1,0 +1,17 @@
+# MAKEREADME backend — runs on the VPS. Image is built by CI, pulled here.
+# Overrides: `docker compose --env-file prod.env up -d`
+services:
+  backend:
+    image: ghcr.io/apsinghsa/makereadme:latest
+    container_name: makereadme-backend
+    restart: unless-stopped
+    env_file:
+      - prod.env
+    ports:
+      - "5002:5000"
+    networks:
+      - makereadme-net
+
+networks:
+  makereadme-net:
+    driver: bridge
