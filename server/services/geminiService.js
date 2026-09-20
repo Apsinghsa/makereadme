@@ -22,7 +22,11 @@ const systemPrompt = fs.readFileSync(path.join(__dirname, "ai_system_prompt.txt"
 // Index of the key that last worked, so we keep using it until it gets rate-limited.
 let preferredKey = 0;
 
-const isRateLimited = (error) => (error?.status ?? error?.response?.status) === 429;
+// Retryable: per-key rate limits (429) and service overload (503).
+const isRetryable = (error) => {
+    const status = error?.status ?? error?.response?.status;
+    return status === 429 || status === 503;
+};
 
 /**
  * Runs `run(client)` starting at `start`, moving to the next client whenever one
@@ -38,8 +42,8 @@ export async function runWithKeyFallback(clients, start, run) {
         try {
             return { result: await run(clients[index]), index };
         } catch (error) {
-            if (!isRateLimited(error) || i === clients.length - 1) throw error;
-            console.warn(`Gemini key ${index + 1}/${clients.length} rate-limited, trying next key…`);
+            if (!isRetryable(error) || i === clients.length - 1) throw error;
+            console.warn(`Gemini key ${index + 1}/${clients.length} rate-limited or unavailable, trying next key…`);
         }
     }
 }
@@ -135,8 +139,8 @@ export async function* generateReadmeFromCodeStream(codeContext) {
         } catch (error) {
             // Once part of the README has been streamed, restarting would duplicate
             // output — surface the error instead of trying the next key.
-            if (emitted || !isRateLimited(error) || i === clients.length - 1) throw error;
-            console.warn(`Gemini key ${index + 1}/${clients.length} rate-limited, trying next key…`);
+            if (emitted || !isRetryable(error) || i === clients.length - 1) throw error;
+            console.warn(`Gemini key ${index + 1}/${clients.length} rate-limited or unavailable, trying next key…`);
         }
     }
 }

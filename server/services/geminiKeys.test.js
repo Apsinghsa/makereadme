@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { runWithKeyFallback } from './geminiService.js';
 
 const rateLimited = () => Object.assign(new Error('429 quota exceeded'), { status: 429 });
+const unavailable = () => Object.assign(new Error('503 overloaded'), { status: 503 });
 const serverError = () => Object.assign(new Error('boom'), { status: 500 });
 
 test('falls back to the next key on 429', async () => {
@@ -17,7 +18,18 @@ test('falls back to the next key on 429', async () => {
   assert.deepEqual(tried, ['a', 'b']);
 });
 
-test('does not retry non-429 errors', async () => {
+test('falls back to the next key on 503', async () => {
+  const tried = [];
+  const { result } = await runWithKeyFallback(['a', 'b'], 0, async (client) => {
+    tried.push(client);
+    if (client === 'a') throw unavailable();
+    return `readme-${client}`;
+  });
+  assert.equal(result, 'readme-b');
+  assert.deepEqual(tried, ['a', 'b']);
+});
+
+test('does not retry other errors', async () => {
   let calls = 0;
   await assert.rejects(
     runWithKeyFallback(['a', 'b'], 0, async () => {
