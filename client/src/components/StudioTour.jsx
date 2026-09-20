@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
 const DONE_KEY = 'makereadme:studio-tour-done';
 const SKIP_KEY = 'makereadme:studio-tour-skipped';
@@ -71,21 +71,19 @@ function place(rect, placement, fallback) {
 }
 
 export default function StudioTour() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(() => {
+    try {
+      return !(localStorage.getItem(DONE_KEY) || sessionStorage.getItem(SKIP_KEY));
+    } catch {
+      // storage unavailable: still show the tour
+      return true;
+    }
+  });
   const [index, setIndex] = useState(0);
   const [dontShow, setDontShow] = useState(false);
   const [rect, setRect] = useState(null);
   const [inHeader, setInHeader] = useState(false);
   const [headerBottom, setHeaderBottom] = useState(0);
-
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(DONE_KEY) || sessionStorage.getItem(SKIP_KEY)) return;
-    } catch {
-      // storage unavailable: still show the tour
-    }
-    setVisible(true);
-  }, []);
 
   const step = STEPS[index];
 
@@ -99,6 +97,7 @@ export default function StudioTour() {
 
   useLayoutEffect(() => {
     if (!visible) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- tooltip rect must be measured from the DOM before paint
     measure();
     window.addEventListener('resize', measure);
     window.addEventListener('scroll', measure, true);
