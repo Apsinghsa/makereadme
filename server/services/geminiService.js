@@ -7,8 +7,48 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const apiKeys = (process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '')
+    .split(',')
+    .map((key) => key.trim())
+    .filter(Boolean);
+
+if (apiKeys.length === 0) {
+    console.warn('No GEMINI_API_KEY / GEMINI_API_KEYS configured — README generation will fail.');
+}
+
+const clients = apiKeys.map((apiKey) => new GoogleGenAI({ apiKey }));
 const systemPrompt = fs.readFileSync(path.join(__dirname, "ai_system_prompt.txt"), 'utf-8');
+
+// Index of the key that last worked, so we keep using it until it gets rate-limited.
+let preferredKey = 0;
+
+const isRateLimited = (error) => (error?.status ?? error?.response?.status) === 429;
+
+/**
+ * Runs `run(client)` starting at `start`, moving to the next client whenever one
+ * is rate-limited (429). Throws the last error once every key has failed.
+ * Returns { result, index } of the client that succeeded.
+ */
+export async function runWithKeyFallback(clients, start, run) {
+    if (clients.length === 0) {
+        throw new Error('No Gemini API keys configured. Set GEMINI_API_KEY or GEMINI_API_KEYS.');
+    }
+    for (let i = 0; i < clients.length; i++) {
+        const index = (start + i) % clients.length;
+        try {
+            return { result: await run(clients[index]), index };
+        } catch (error) {
+            if (!isRateLimited(error) || i === clients.length - 1) throw error;
+            console.warn(`Gemini key ${index + 1}/${clients.length} rate-limited, trying next key…`);
+        }
+    }
+}
+
+async function callGemini(run) {
+    const { result, index } = await runWithKeyFallback(clients, preferredKey, run);
+    preferredKey = index;
+    return result;
+}
 
 /**
  * Step 1: Ask Gemini which files it needs to generate a README.
@@ -26,13 +66,13 @@ Do NOT include test files, lock files, or generated files.
 Respond with ONLY the JSON array, no markdown fences, no explanation.
 Example: ["package.json", "src/index.js", "README.md"]`;
 
-    const response = await ai.models.generateContent({
+    const response = await callGemini((client) => client.models.generateContent({
         model: "gemini-2.5-flash",
         contents: prompt,
         config: {
             thinkingConfig: { thinkingBudget: -1 },
         },
-    });
+    }));
 
     const raw = response.text.trim();
     // Strip possible markdown fences
@@ -52,14 +92,14 @@ Example: ["package.json", "src/index.js", "README.md"]`;
  * Step 2: Generate README from selected file contents.
  */
 export async function generateReadmeFromCode(codeContext) {
-    const response = await ai.models.generateContent({
+    const response = await callGemini((client) => client.models.generateContent({
         model: "gemini-2.5-flash",
         contents: codeContext,
         config: {
             systemInstruction: systemPrompt,
             thinkingConfig: { thinkingBudget: -1 },
         },
-    });
+    }));
     return response.text;
 }
 
@@ -68,18 +108,35 @@ export async function generateReadmeFromCode(codeContext) {
  * Returns an async generator yielding text strings.
  */
 export async function* generateReadmeFromCodeStream(codeContext) {
-    const stream = await ai.models.generateContentStream({
-        model: "gemini-2.5-flash",
-        contents: codeContext,
-        config: {
-            systemInstruction: systemPrompt,
-            thinkingConfig: { thinkingBudget: -1 },
-        },
-    });
-    for await (const chunk of stream) {
-        const text = chunk.text;
-        if (text) {
-            yield text;
+    if (clients.length === 0) {
+        throw new Error('No Gemini API keys configured. Set GEMINI_API_KEY or GEMINI_API_KEYS.');
+    }
+    for (let i = 0; i < clients.length; i++) {
+        const index = (preferredKey + i) % clients.length;
+        let emitted = false;
+        try {
+            const stream = await clients[index].models.generateContentStream({
+                model: "gemini-2.5-flash",
+                contents: codeContext,
+                config: {
+                    systemInstruction: systemPrompt,
+                    thinkingConfig: { thinkingBudget: -1 },
+                },
+            });
+            for await (const chunk of stream) {
+                const text = chunk.text;
+                if (text) {
+                    emitted = true;
+                    yield text;
+                }
+            }
+            preferredKey = index;
+            return;
+        } catch (error) {
+            // Once part of the README has been streamed, restarting would duplicate
+            // output — surface the error instead of trying the next key.
+            if (emitted || !isRateLimited(error) || i === clients.length - 1) throw error;
+            console.warn(`Gemini key ${index + 1}/${clients.length} rate-limited, trying next key…`);
         }
     }
 }

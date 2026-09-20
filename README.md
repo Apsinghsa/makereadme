@@ -44,7 +44,7 @@ Ensure you have the following installed:
 *   **Node.js**: LTS version recommended.
 *   **npm**: Node Package Manager, which comes bundled with Node.js.
 *   **GitHub Personal Access Token**: A token with `repo` scope is required for the server to fetch private repositories or to overcome rate limits on public repositories.
-*   **Google Gemini API Key**: An API key for accessing the Google Gemini (Generative AI) service.
+*   **Google Gemini API Key**: One or more API keys for accessing the Google Gemini (Generative AI) service.
 
 ### Installation
 
@@ -74,6 +74,8 @@ Ensure you have the following installed:
     GITHUB_TOKEN=your_github_personal_access_token
     GEMINI_API_KEY=your_google_gemini_api_key
     ```
+
+    Multiple Gemini keys can be provided as a comma-separated list (e.g. `GEMINI_API_KEY=key_one,key_two`). When a key returns a 429 rate-limit error, the server automatically retries with the next key.
 
 ### Usage
 
