@@ -30,6 +30,7 @@ export default function TopBar({
         <img src="/icon.png" alt="MakeReadme" className="h-16 w-auto block" />
       </Link>
       <form
+        data-tour="generate"
         className="grid grid-cols-[1fr_auto] gap-2 min-w-0 max-[820px]:grid-cols-1"
         onSubmit={handleSubmit}
       >
@@ -57,7 +58,7 @@ export default function TopBar({
           {isGenerating ? "Generating…" : "Generate"}
         </button>
       </form>
-      <div className="flex justify-end gap-2 max-[820px]:justify-start max-[560px]:flex-wrap">
+      <div data-tour="export" className="flex justify-end gap-2 max-[820px]:justify-start max-[560px]:flex-wrap">
         <button
           className="inline-flex items-center justify-center min-h-[40px] px-5 py-1 border border-border rounded-sm bg-transparent text-fg font-medium leading-loose no-underline transition-colors hover:border-fg-2 hover:text-fg disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={onCopy}

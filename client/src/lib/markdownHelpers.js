@@ -1,14 +1,14 @@
 /**
  * Insert a badge into the markdown after the first heading block.
  *
- * Badges are placed inside a single <p align="center"> block that lives
- * immediately after the title/subheading. Multiple badges share that one block,
- * separated by a single space — no blank lines between them — so GitHub renders
- * them as a horizontal row rather than stacking them vertically.
+ * Badges are written as a plain markdown paragraph with blank lines around it,
+ * so the image syntax renders as an image. Markdown inside a raw
+ * `<p align="center">` block is not parsed and shows up as literal text.
+ * Multiple badges share one line, separated by a space, so they stay in a row.
  */
 export function insertBadgeAfterHeading(content, badgeMd) {
   if (!content) {
-    return `<p align="center">\n${badgeMd}\n</p>\n`;
+    return `${badgeMd}\n`;
   }
 
   const lines = content.split('\n');
@@ -18,54 +18,47 @@ export function insertBadgeAfterHeading(content, badgeMd) {
     (l) => l.startsWith('<h1') || l.startsWith('# ')
   );
 
-  if (h1idx !== -1) {
-    // Look for an existing <p align="center"> badge block within the next 15 lines
-    let centerStart = -1;
-    let centerEnd = -1;
-    const searchLimit = Math.min(h1idx + 15, lines.length);
-
-    for (let i = h1idx + 1; i < searchLimit; i++) {
-      if (lines[i].startsWith('<p align="center">') || lines[i] === '<p align="center">') {
-        centerStart = i;
-      }
-      if (centerStart !== -1 && lines[i].startsWith('</p>')) {
-        centerEnd = i;
-        break;
-      }
-    }
-
-    if (centerStart !== -1 && centerEnd !== -1) {
-      // Append the new badge to the line just before </p>, separated by a space.
-      // Find the last non-empty badge line inside the block.
-      let insertAt = centerEnd; // default: insert right before </p>
-      for (let i = centerEnd - 1; i > centerStart; i--) {
-        if (lines[i].trim() !== '') {
-          // Append badge to this line (same line = side-by-side in GitHub)
-          lines[i] = lines[i] + ' ' + badgeMd;
-          return lines.join('\n');
-        }
-      }
-      // Block is empty — insert a badge line before </p>
-      lines.splice(insertAt, 0, badgeMd);
-      return lines.join('\n');
-    } else {
-      // No existing badge block — create one right after the heading / subheading block.
-      // Skip past any <h3> line that immediately follows the <h1>.
-      let insertAfter = h1idx;
-      if (
-        h1idx + 1 < lines.length &&
-        (lines[h1idx + 1].startsWith('<h3') || lines[h1idx + 1].startsWith('## '))
-      ) {
-        insertAfter = h1idx + 1;
-      }
-      // Insert block: blank line, badge block, blank line
-      lines.splice(insertAfter + 1, 0, '', '<p align="center">', badgeMd, '</p>', '');
-      return lines.join('\n');
-    }
+  if (h1idx === -1) {
+    return `${badgeMd}\n\n${content}`;
   }
 
-  // No heading found — prepend a badge block at the top
-  return `<p align="center">\n${badgeMd}\n</p>\n\n${content}`;
+  // Start right after the title, skipping the centered subheading when present.
+  let pos = h1idx + 1;
+  if (pos < lines.length && (lines[pos].startsWith('<h3') || lines[pos].startsWith('## '))) {
+    pos++;
+  }
+  while (pos < lines.length && lines[pos].trim() === '') pos++;
+
+  const first = lines[pos]?.trim() ?? '';
+  const isBadgeLine = (l) => /^!\[.*\]\(.*\)/.test(l);
+
+  if (isBadgeLine(first)) {
+    // Append to the existing badge row (same line keeps them side by side).
+    lines[pos] = `${lines[pos].replace(/\s+$/, '')} ${badgeMd}`;
+    return lines.join('\n');
+  }
+
+  if (first === '<p align="center">') {
+    // Unwrap a legacy centered block: markdown inside raw HTML renders as text.
+    let end = pos;
+    const badges = [];
+    for (let i = pos + 1; i < lines.length; i++) {
+      if (lines[i].trim().startsWith('</p>')) {
+        end = i;
+        break;
+      }
+      if (isBadgeLine(lines[i].trim())) badges.push(lines[i].trim());
+      end = i;
+    }
+    badges.push(badgeMd);
+    lines.splice(pos, end - pos + 1, badges.join(' '));
+    return lines.join('\n');
+  }
+
+  // No badge paragraph yet — add one, with a blank line on each side.
+  const block = lines[pos - 1]?.trim() === '' ? [badgeMd, ''] : ['', badgeMd, ''];
+  lines.splice(pos, 0, ...block);
+  return lines.join('\n');
 }
 
 export function countLines(content) {

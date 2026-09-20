@@ -33,7 +33,9 @@ export async function fetchAndProcessRepoFiles(octokit, owner, repo, ref) {
         zipEntries = zip.getEntries();
     } catch (error) {
         console.error('Error fetching repository:', error);
-        throw new Error('Failed to fetch repository from GitHub.');
+        const fetchError = new Error('Failed to fetch repository from GitHub.');
+        fetchError.status = error.status;
+        throw fetchError;
     }
 
     const rawFileTree = [];

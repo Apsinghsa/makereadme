@@ -34,7 +34,7 @@ export default function SectionControls({ selectedSections, onChange }) {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" data-tour="sections">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-muted text-xs font-bold uppercase">Sections</h2>
         <div className="flex items-center gap-2 shrink-0">

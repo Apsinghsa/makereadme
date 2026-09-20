@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import fetchAndProcessRepoContents, { fetchAndProcessRepoContentsStream } from '../controllers/readmeController.js';
+import { friendlyGenerationError } from '../services/errorMessages.js';
 
 router.get('/generate', async (req, res) => {
     try {
@@ -34,9 +35,12 @@ router.get('/generate', async (req, res) => {
         res.end();
     } catch (error) {
         console.error('Error generating README:', error);
+        const message = friendlyGenerationError(error);
         if (!res.headersSent) {
-            res.status(500).json({ error: error.message || 'Failed to generate README' });
+            res.status(500).json({ error: message });
         } else {
+            // Stream already started — tell the client it failed instead of silently ending.
+            res.write(`\x1e${JSON.stringify({ type: 'error', message })}\n`);
             res.end();
         }
     }

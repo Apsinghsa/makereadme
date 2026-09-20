@@ -5,7 +5,7 @@ export default function EditorPreview({ content, onChange, viewMode, setViewMode
   const showPreview = viewMode === 'preview' || viewMode === 'split';
 
   return (
-    <main className="min-w-0 grid grid-rows-[auto_1fr] bg-surface">
+    <main data-tour="editor" className="min-w-0 min-h-0 grid grid-rows-[auto_1fr] bg-surface">
       <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-border bg-bg max-[820px]:items-start max-[820px]:flex-col">
         <div className="grid gap-1">
           <h1 className="text-xl leading-[1.25] font-display">README Studio</h1>
@@ -30,14 +30,14 @@ export default function EditorPreview({ content, onChange, viewMode, setViewMode
         </div>
       </div>
 
-      <section className="grid grid-cols-2 gap-4 p-5 min-h-0 max-[820px]:grid-cols-1 max-[820px]:p-4">
-        <article className={`min-w-0 min-h-0 grid grid-rows-[auto_1fr] border border-border rounded-lg bg-bg overflow-hidden ${showPreview && !showEditor ? 'max-[820px]:hidden' : ''}`}>
+      <section className={`grid grid-rows-[minmax(0,1fr)] gap-4 p-5 min-h-0 min-[1101px]:pb-2 max-[820px]:p-4 ${showEditor && showPreview ? 'grid-cols-2 max-[820px]:grid-cols-1' : 'grid-cols-1'}`}>
+        <article className={`min-w-0 min-h-0 grid grid-rows-[auto_minmax(0,1fr)] border border-border rounded-lg bg-bg overflow-hidden ${showPreview && !showEditor ? 'hidden' : ''}`}>
           <div className="flex justify-between gap-4 px-4 py-3 border-b border-border text-muted text-sm">
             <span>EDITOR</span>
             <span>{lineCount} lines</span>
           </div>
           <textarea
-            className="w-full h-full min-h-[520px] max-[820px]:min-h-[420px] resize-none border-0 rounded-none p-5 bg-bg text-fg font-mono text-sm outline-none leading-[1.55]"
+            className="w-full h-full min-h-0 max-[1100px]:min-h-[520px] max-[820px]:min-h-[420px] resize-none border-0 rounded-none p-5 bg-bg text-fg font-mono text-sm outline-none leading-[1.55]"
             value={content}
             onChange={(e) => onChange(e.target.value)}
             spellCheck={false}
@@ -45,7 +45,7 @@ export default function EditorPreview({ content, onChange, viewMode, setViewMode
           />
         </article>
 
-        <article className={`min-w-0 min-h-0 grid grid-rows-[auto_1fr] border border-border rounded-lg bg-bg overflow-hidden ${showEditor && !showPreview ? 'max-[820px]:hidden' : ''}`}>
+        <article className={`min-w-0 min-h-0 grid grid-rows-[auto_minmax(0,1fr)] border border-border rounded-lg bg-bg overflow-hidden ${showEditor && !showPreview ? 'hidden' : ''}`}>
           <div className="flex justify-between gap-4 px-4 py-3 border-b border-border text-muted text-sm">
             <span>PREVIEW</span>
             <span>live</span>

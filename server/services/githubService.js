@@ -5,6 +5,14 @@ import { fetchAndProcessRepoFiles } from "./github/files.js";
 import { askGeminiForRequiredFiles, generateReadmeFromCode, generateReadmeFromCodeStream } from "./geminiService.js";
 
 /**
+ * Status events share the stream with README chunks. A status line is prefixed
+ * with the ASCII record separator (never present in markdown) and JSON encoded,
+ * so the client can tell progress updates apart from content.
+ */
+const statusEvent = (step, message) =>
+    `\x1e${JSON.stringify({ type: 'status', step, message })}\n`;
+
+/**
  * Tries fetching repo files using 'main', then falls back to 'master' if that fails.
  */
 async function fetchWithBranchFallback(octokit, username, repo) {
@@ -89,11 +97,14 @@ export async function* fetchAndProcessRepoContentsStream(repoUrl, size = 'standa
     });
 
     // 1. Fetch file tree + all content (branch fallback: main → master)
+    yield statusEvent('clone', 'Cloning the repository');
     let { fileTree, fileContents } = await fetchWithBranchFallback(octokit, username, repo);
 
     console.log(`Fetched ${fileTree.length} files from repo.`);
 
     // 2. Ask Gemini which files it actually needs
+    yield statusEvent('files', `Reading the file list (${fileTree.length} files)`);
+    yield statusEvent('select', 'Choosing the correct files');
     let requiredFiles = await askGeminiForRequiredFiles(fileTree);
     let selectedFiles = null;
 
@@ -108,6 +119,7 @@ export async function* fetchAndProcessRepoContentsStream(repoUrl, size = 'standa
     const codeContext = buildCodeContext(repoUrl, size, sections, fileTree, selectedFiles, fileContents);
 
     // 3. Stream the README generation
+    yield statusEvent('generate', 'Generating your README');
     for await (const chunk of generateReadmeFromCodeStream(codeContext)) {
         yield chunk;
     }

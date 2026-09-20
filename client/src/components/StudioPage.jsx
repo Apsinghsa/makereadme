@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { DEFAULT_SIZE, SECTIONS } from '../lib/constants';
+import { DEFAULT_SIZE } from '../lib/constants';
 import { useStreamingReadme } from '../hooks/useStreamingReadme';
 import { insertBadgeAfterHeading, countLines, countActiveSections } from '../lib/markdownHelpers';
 import TopBar from './TopBar';
 import Sidebar from './Sidebar';
 import SectionControls from './SectionControls';
 import BadgePanel from './BadgePanel';
+import StatusNotification from './StatusNotification';
 import EditorPreview from './EditorPreview';
+import StudioTour from './StudioTour';
 import Footer from './Footer';
 
 export default function StudioPage() {
@@ -20,28 +22,17 @@ export default function StudioPage() {
   const [sections, setSections] = useState([]);
   const [viewMode, setViewMode] = useState('split');
   const [copied, setCopied] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('Ready to edit');
+  const [statusDismissed, setStatusDismissed] = useState(false);
 
   const {
     markdown,
     setMarkdown,
+    steps,
     isGenerating,
     isGenerated,
     error,
     startGeneration,
   } = useStreamingReadme();
-
-  useEffect(() => {
-    if (isGenerating) {
-      setStatusMessage('Generating…');
-    } else if (isGenerated) {
-      setStatusMessage('Generated from repository URL');
-    } else if (error) {
-      setStatusMessage(error);
-    } else {
-      setStatusMessage('Ready to edit');
-    }
-  }, [isGenerating, isGenerated, error]);
 
   useEffect(() => {
     if (!copied) return;
@@ -53,8 +44,11 @@ export default function StudioPage() {
     setRepoUrl(url);
   }, []);
 
+  const handleDismissStatus = useCallback(() => setStatusDismissed(true), []);
+
   const handleGenerate = useCallback(() => {
     if (!repoUrl.trim()) return;
+    setStatusDismissed(false);
     startGeneration(repoUrl, size, sections);
   }, [repoUrl, size, sections, startGeneration]);
 
@@ -68,9 +62,8 @@ export default function StudioPage() {
     try {
       await navigator.clipboard.writeText(markdown);
       setCopied(true);
-      setStatusMessage('Copied README to clipboard');
     } catch {
-      setStatusMessage('Copy failed');
+      // clipboard unavailable, nothing to do
     }
   }, [markdown]);
 
@@ -85,7 +78,6 @@ export default function StudioPage() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    setStatusMessage('Downloaded README.md');
   }, [markdown]);
 
   const lineCount = countLines(markdown);
@@ -105,7 +97,7 @@ export default function StudioPage() {
         noSections={sections.length === 0}
       />
 
-      <div className="grid grid-cols-[300px_minmax(0,1fr)] min-h-[calc(100vh-65px)] max-[1100px]:grid-cols-1">
+      <div className="grid grid-cols-[300px_minmax(0,1fr)] min-h-0 min-[1101px]:h-[calc(100vh-96px)] max-[1100px]:grid-cols-1">
         <Sidebar>
           <SectionControls selectedSections={sections} onChange={setSections} />
           <BadgePanel onInsertBadge={handleInsertBadge} disabled={!isGenerated} repoUrl={repoUrl} />
@@ -114,7 +106,6 @@ export default function StudioPage() {
             <div className="border border-border rounded-lg bg-surface p-4 text-muted text-sm grid gap-2">
               <p><strong className="text-fg">{lineCount}</strong> lines</p>
               <p><strong className="text-fg">{activeSectionCount}</strong> active sections</p>
-              <p>{statusMessage}</p>
             </div>
           </section>
         </Sidebar>
@@ -129,6 +120,14 @@ export default function StudioPage() {
       </div>
 
       <Footer />
+      <StatusNotification
+        steps={steps}
+        error={error}
+        isGenerated={isGenerated}
+        visible={!statusDismissed}
+        onDismiss={handleDismissStatus}
+      />
+      <StudioTour />
     </div>
   );
 }

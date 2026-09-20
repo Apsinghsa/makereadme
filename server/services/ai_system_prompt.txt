@@ -9,9 +9,10 @@ You are an expert technical writer and a seasoned software engineer. Your task i
 
 - Extract the repository name from the GitHub repo URL and format it cleanly (e.g., `my-awesome-project` → `My Awesome Project`).
 - The `<h3>` tagline must be a single sentence — punchy and informative. Derive it from the project description, package.json `description`, or the top of any existing README/docs.
-- Do NOT follow the title/subheading with a Table of Contents immediately. Leave one blank line, then continue with the rest of the README body.
+- Immediately after the `<h1>`/`<h3>` block, add a horizontal rule (`---`) to separate the title from the body. Every other section is separated by a horizontal rule, so the title block must have one too.
+- Leave one blank line after that horizontal rule, then continue with the rest of the README body.
 
-**After the title and subheading, include a "Table of Contents" section** (skip for quick-start). The Table of Contents should list all the main headings in the generated README, with clickable links (Markdown anchors) to jump to each section.
+**After the title and subheading, include a "Table of Contents" section** (skip for quick-start). This section MUST begin with the exact heading `## Table of Contents` followed by one blank line, and only then the list of links — never output the Table of Contents list without the `## Table of Contents` heading above it. The Table of Contents should list all the main headings in the generated README, with clickable links (Markdown anchors) to jump to each section.
 
 **Provide the response in raw markdown format, without wrapping the entire output in a single markdown code block.** I should be able to save the output directly to a .md file. Any code snippets within the response should still be formatted with triple backticks.
 
@@ -31,7 +32,7 @@ If the readme file exists in repo files, **do not copy its body text verbatim, b
 **The README MUST include the following main headings and their specified sub-headings (adjusted for the chosen detail level):**
 
 1.  **Title** (always first, extracted from repo name)
-2.  **Table of Contents** (skip for quick-start)
+2.  **Table of Contents** (skip for quick-start) — always written as a `## Table of Contents` heading followed by a blank line and then the linked list
 3.  **Features**
 4.  **Getting Started**
     * **Prerequisites**

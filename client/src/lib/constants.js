@@ -12,6 +12,17 @@ export const README_SIZES = [
 export const DEFAULT_SIZE = 'standard';
 
 /**
+ * Ordered generation steps shown in the live status panel. The server emits a
+ * status event per step; labels update with the message it sends.
+ */
+export const GENERATION_STEPS = [
+  { id: 'clone', label: 'Cloning the repository' },
+  { id: 'files', label: 'Reading the file list' },
+  { id: 'select', label: 'Choosing the correct files' },
+  { id: 'generate', label: 'Generating your README' },
+];
+
+/**
  * All default sections = false. User must choose at least one before generating.
  *
  * Grouped by function so the tag cloud has a natural reading order:
