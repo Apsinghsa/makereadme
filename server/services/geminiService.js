@@ -19,6 +19,15 @@ if (apiKeys.length === 0) {
 const clients = apiKeys.map((apiKey) => new GoogleGenAI({ apiKey }));
 const systemPrompt = fs.readFileSync(path.join(__dirname, "ai_system_prompt.txt"), 'utf-8');
 
+// Model IDs. gemini-2.5-flash was deprecated on 2 Nov 2026 and returns 404
+// NOT_FOUND for keys without legacy 2.5 access — see
+// https://ai.google.dev/gemini-api/docs/deprecations
+const MODEL = 'gemini-3.6-flash';
+
+// Gemini 3.x replaces thinkingBudget with thinkingLevel (MINIMAL | LOW | MEDIUM | HIGH).
+// 'MEDIUM' is 3.6 Flash's documented default; bump to 'HIGH' for deeper reasoning.
+const THINKING = { thinkingLevel: 'MEDIUM' };
+
 // Index of the key that last worked, so we keep using it until it gets rate-limited.
 let preferredKey = 0;
 
@@ -71,10 +80,10 @@ Respond with ONLY the JSON array, no markdown fences, no explanation.
 Example: ["package.json", "src/index.js", "README.md"]`;
 
     const response = await callGemini((client) => client.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: MODEL,
         contents: prompt,
         config: {
-            thinkingConfig: { thinkingBudget: -1 },
+            thinkingConfig: THINKING,
         },
     }));
 
@@ -97,11 +106,11 @@ Example: ["package.json", "src/index.js", "README.md"]`;
  */
 export async function generateReadmeFromCode(codeContext) {
     const response = await callGemini((client) => client.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: MODEL,
         contents: codeContext,
         config: {
             systemInstruction: systemPrompt,
-            thinkingConfig: { thinkingBudget: -1 },
+            thinkingConfig: THINKING,
         },
     }));
     return response.text;
@@ -120,11 +129,11 @@ export async function* generateReadmeFromCodeStream(codeContext) {
         let emitted = false;
         try {
             const stream = await clients[index].models.generateContentStream({
-                model: "gemini-2.5-flash",
+                model: MODEL,
                 contents: codeContext,
                 config: {
                     systemInstruction: systemPrompt,
-                    thinkingConfig: { thinkingBudget: -1 },
+                    thinkingConfig: THINKING,
                 },
             });
             for await (const chunk of stream) {
